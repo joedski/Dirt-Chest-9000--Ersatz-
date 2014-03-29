@@ -1,6 +1,7 @@
 package com.atalhlla.dirtchest9000;
 
 import com.atalhlla.dirtchest9000.block.DirtChest9000Blocks;
+import com.atalhlla.dirtchest9000.common.network.DirtChest9000GuiHandler;
 import com.atalhlla.dirtchest9000.proxy.CommonProxy;
 import com.atalhlla.util.minecraft.ModUtils;
 
@@ -37,7 +38,8 @@ public class DirtChest9000Mod {
 
 	@EventHandler
 	public void init( FMLInitializationEvent event ) {
-		// init...
+		// Don't need to reference from here?  (It's already retained by the Forge NetworkRegistry.)
+		new DirtChest9000GuiHandler();
 	}
 
 	@EventHandler
