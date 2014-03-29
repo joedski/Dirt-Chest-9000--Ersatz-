@@ -124,4 +124,87 @@ public class ContainerDirtChest extends Container {
 		// And return the resulting items.
 		return result;
 	}
+
+	@Override
+	protected boolean mergeItemStack( ItemStack incomingItemStack, int rangeStart, int rangeEnd, boolean startAtEnd ) {
+		boolean flag1 = false;
+		int ci = rangeStart;
+
+		if( startAtEnd ) {
+			ci = rangeEnd - 1;
+		}
+
+		Slot slot;
+		ItemStack slotItemStack;
+
+		// First, try to distribute our incoming ItemStack to any slots that
+		// contain the same type of item.
+		if( incomingItemStack.isStackable() ) {
+			while( incomingItemStack.stackSize > 0 && (!startAtEnd && ci < rangeEnd || startAtEnd && ci >= rangeStart) ) {
+				slot = (Slot) this.inventorySlots.get( ci );
+				slotItemStack = slot.getStack();
+
+				if( slotItemStack != null && slotItemStack.getItem() == incomingItemStack.getItem() && (!incomingItemStack.getHasSubtypes() || incomingItemStack.getItemDamage() == slotItemStack.getItemDamage()) && ItemStack.areItemStackTagsEqual( incomingItemStack, slotItemStack ) ) {
+					int l = slotItemStack.stackSize + incomingItemStack.stackSize;
+
+					if( l <= incomingItemStack.getMaxStackSize() ) {
+						incomingItemStack.stackSize = 0;
+						slotItemStack.stackSize = l;
+						slot.onSlotChanged();
+						flag1 = true;
+					}
+					else if( slotItemStack.stackSize < incomingItemStack.getMaxStackSize() ) {
+						incomingItemStack.stackSize -= incomingItemStack.getMaxStackSize() - slotItemStack.stackSize;
+						slotItemStack.stackSize = incomingItemStack.getMaxStackSize();
+						slot.onSlotChanged();
+						flag1 = true;
+					}
+				}
+
+				if( startAtEnd ) {
+					--ci;
+				}
+				else {
+					++ci;
+				}
+			}
+		}
+
+		// If we still have items left, or the item wasn't stackable, try to put
+		// it anywhere.
+		if( incomingItemStack.stackSize > 0 ) {
+			if( startAtEnd ) {
+				ci = rangeEnd - 1;
+			}
+			else {
+				ci = rangeStart;
+			}
+
+			while( !startAtEnd && ci < rangeEnd || startAtEnd && ci >= rangeStart ) {
+				slot = (Slot) this.inventorySlots.get( ci );
+				slotItemStack = slot.getStack();
+
+				// Here's the only change I made to this function:
+				// We only check if the item is valid here because we're
+				// assuming that in the previous section, if the slot /already/
+				// contained that type of item, the item is valid.
+				if( slotItemStack == null && slot.isItemValid( incomingItemStack ) ) {
+					slot.putStack( incomingItemStack.copy() );
+					slot.onSlotChanged();
+					incomingItemStack.stackSize = 0;
+					flag1 = true;
+					break;
+				}
+
+				if( startAtEnd ) {
+					--ci;
+				}
+				else {
+					++ci;
+				}
+			}
+		}
+
+		return flag1;
+	}
 }
