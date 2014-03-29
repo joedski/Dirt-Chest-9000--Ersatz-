@@ -1,12 +1,12 @@
 package com.atalhlla.dirtchest9000.inventory;
 
-import com.atalhlla.dirtchest9000.tileentity.TileEntityDirtChest;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+
+import com.atalhlla.dirtchest9000.tileentity.TileEntityDirtChest;
 
 public class ContainerDirtChest extends Container {
 
@@ -36,7 +36,7 @@ public class ContainerDirtChest extends Container {
 		}
 
 		// Dirt Chest 9000
-		this.addSlotToContainer( new Slot( tileEntity, 0, 80, 58 ) );
+		this.addSlotToContainer( new SlotDirtChest( tileEntity, 0, 80, 58 ) );
 	}
 
 	/*
