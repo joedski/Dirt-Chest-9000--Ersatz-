@@ -34,6 +34,7 @@ public class DirtChest9000Mod {
 	@EventHandler
 	public void preInit( FMLPreInitializationEvent event ) throws InstantiationException, IllegalAccessException {
 		DirtChest9000Blocks.registerBlocks();
+		DirtChest9000Blocks.registerTileEntities();
 	}
 
 	@EventHandler
