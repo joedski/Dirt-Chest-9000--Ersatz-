@@ -1,21 +1,25 @@
 package com.atalhlla.dirtchest9000.block;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import com.atalhlla.dirtchest9000.DirtChest9000Mod;
+import com.atalhlla.dirtchest9000.tileentity.TileEntityDirtChest;
 
+import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockDirtChest extends Block {
+public class BlockDirtChest extends BlockContainer {
 	public static final String NAME = "dirt_chest_9000";
 
 	public static IIcon iconTop;
@@ -28,6 +32,12 @@ public class BlockDirtChest extends Block {
 		setCreativeTab( CreativeTabs.tabRedstone );
 		setHardness( 5F );
 		setResistance( 10F );
+	}
+
+	// I don't actually know if the second param is meta.
+	@Override
+	public TileEntity createNewTileEntity( World world, int meta ) {
+		return new TileEntityDirtChest();
 	}
 
 	@Override
@@ -71,5 +81,31 @@ public class BlockDirtChest extends Block {
 			side = 4;
 
 		world.setBlockMetadataWithNotify( x, y, z, side, 2 );
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * Set a default value so blocks are never just blank unfaced boxes.
+	 * 
+	 * @see
+	 * net.minecraft.block.BlockContainer#onBlockAdded(net.minecraft.world.World
+	 * , int, int, int)
+	 */
+	@Override
+	public void onBlockAdded( World world, int x, int y, int z ) {
+		// TODO Auto-generated method stub
+		super.onBlockAdded( world, x, y, z );
+		world.setBlockMetadataWithNotify( x, y, z, 2, 2 );
+	}
+
+	@Override
+	public boolean onBlockActivated( World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ ) {
+		if( world.isRemote )
+			return true;
+
+		FMLNetworkHandler.openGui( player, DirtChest9000Mod.instance, 0, world, x, y, z );
+		
+		return true;
 	}
 }
