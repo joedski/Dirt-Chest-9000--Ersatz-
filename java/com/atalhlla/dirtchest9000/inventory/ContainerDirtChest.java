@@ -39,6 +39,16 @@ public class ContainerDirtChest extends Container {
 		this.addSlotToContainer( new Slot( tileEntity, 0, 80, 58 ) );
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * You know, you could make a tileentity which only lets someone interact
+	 * with it if they're a minimum distance away...
+	 * 
+	 * @see
+	 * net.minecraft.inventory.Container#canInteractWith(net.minecraft.entity
+	 * .player.EntityPlayer)
+	 */
 	@Override
 	public boolean canInteractWith( EntityPlayer player ) {
 		return tileEntity.isUseableByPlayer( player );

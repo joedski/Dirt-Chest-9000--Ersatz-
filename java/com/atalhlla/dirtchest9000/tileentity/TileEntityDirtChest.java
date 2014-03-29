@@ -3,6 +3,8 @@ package com.atalhlla.dirtchest9000.tileentity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityDirtChest extends TileEntity implements IInventory {
@@ -95,4 +97,49 @@ public class TileEntityDirtChest extends TileEntity implements IInventory {
 		return true;
 	}
 
+	@Override
+	public void writeToNBT( NBTTagCompound nbtTag ) {
+		super.writeToNBT( nbtTag );
+
+		NBTTagList list = new NBTTagList();
+
+		for( int i = 0; i < getSizeInventory(); ++i ) {
+			ItemStack itemStack = getStackInSlot( i );
+
+			if( itemStack == null )
+				continue;
+
+			NBTTagCompound item = new NBTTagCompound();
+			item.setByte( "Dirt Chest Slot", (byte) i );
+			itemStack.writeToNBT( item );
+
+			// Note, NBTTagLists must contain items of all the same type (like
+			// vectors). Trying to write tags with different types to the same
+			// list will result in an error message and failure to write the
+			// second tag.
+			list.appendTag( item );
+		}
+
+		nbtTag.setTag( "Dirt Chest Items", list );
+	}
+
+	@Override
+	public void readFromNBT( NBTTagCompound nbtTag ) {
+		super.readFromNBT( nbtTag );
+
+		byte compoundTagType = (new NBTTagCompound()).getId();
+
+		// 1.7 added an tag type for lists. If you specify the wrong tag type,
+		// you get an empty (new) list.
+		NBTTagList list = nbtTag.getTagList( "Dirt Chest Items", compoundTagType );
+
+		for( int i = 0, c = list.tagCount(); i < c; ++i ) {
+			NBTTagCompound item = list.getCompoundTagAt( i );
+			int slotIndex = item.getByte( "Dirt Chest Slot" );
+
+			if( slotIndex >= 0 && slotIndex < getSizeInventory() ) {
+				setInventorySlotContents( slotIndex, ItemStack.loadItemStackFromNBT( item ) );
+			}
+		}
+	}
 }
